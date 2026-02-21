@@ -58,13 +58,30 @@ export function Table<T>({
                     ) : (
                         data.map((row, rowIndex) => (
                             <tr key={rowIndex} className="hover:bg-white/3 transition-colors duration-300 group">
-                                {columns.map((col, colIndex) => (
-                                    <td key={colIndex} className="px-6 py-4 whitespace-nowrap text-sm text-gray-300 group-hover:text-white transition-colors duration-300">
-                                        {typeof col.accessor === 'function' 
-                                            ? col.accessor(row) 
-                                            : String(row[col.accessor])}
-                                    </td>
-                                ))}
+                                {columns.map((col, colIndex) => {
+                                    let cellContent;
+                                    if (typeof col.accessor === 'function') {
+                                        cellContent = col.accessor(row);
+                                    } else {
+                                        const value = row[col.accessor];
+                                        // Handle Firestore Timestamps and Dates
+                                        if (value && typeof value === 'object' && 'toDate' in value) {
+                                            cellContent = value.toDate().toLocaleString();
+                                        } else if (value instanceof Date) {
+                                            cellContent = value.toLocaleString();
+                                        } else if (value === null || value === undefined) {
+                                            cellContent = '-';
+                                        } else {
+                                            cellContent = String(value);
+                                        }
+                                    }
+                                    
+                                    return (
+                                        <td key={colIndex} className="px-6 py-4 whitespace-nowrap text-sm text-gray-300 group-hover:text-white transition-colors duration-300">
+                                            {cellContent}
+                                        </td>
+                                    );
+                                })}
                             </tr>
                         ))
                     )}
