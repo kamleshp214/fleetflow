@@ -65,8 +65,9 @@ export function Table<T>({
                                     } else {
                                         const value = row[col.accessor];
                                         // Handle Firestore Timestamps and Dates
-                                        if (value && typeof value === 'object' && 'toDate' in value) {
-                                            cellContent = value.toDate().toLocaleString();
+                                        if (value && typeof value === 'object' && 'toDate' in value && typeof value.toDate === 'function') {
+                                            // Type assertion for Firestore Timestamp
+                                            cellContent = (value.toDate as () => Date)().toLocaleString();
                                         } else if (value instanceof Date) {
                                             cellContent = value.toLocaleString();
                                         } else if (value === null || value === undefined) {
