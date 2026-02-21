@@ -64,15 +64,27 @@ export function Table<T>({
                                         cellContent = col.accessor(row);
                                     } else {
                                         const value = row[col.accessor];
-                                        // Handle Firestore Timestamps and Dates
-                                        if (value && typeof value === 'object' && 'toDate' in value && typeof value.toDate === 'function') {
-                                            // Type assertion for Firestore Timestamp
-                                            cellContent = (value.toDate as () => Date)().toLocaleString();
-                                        } else if (value instanceof Date) {
-                                            cellContent = value.toLocaleString();
-                                        } else if (value === null || value === undefined) {
+                                        
+                                        // Handle null/undefined first
+                                        if (value === null || value === undefined) {
                                             cellContent = '-';
-                                        } else {
+                                        }
+                                        // Handle Firestore Timestamps
+                                        else if (value && typeof value === 'object' && 'toDate' in value && typeof value.toDate === 'function') {
+                                            try {
+                                                const date = (value.toDate as () => Date)();
+                                                cellContent = date ? date.toLocaleString() : '-';
+                                            } catch (e) {
+                                                console.error('Error converting Firestore Timestamp:', e);
+                                                cellContent = '-';
+                                            }
+                                        }
+                                        // Handle Date objects
+                                        else if (value instanceof Date) {
+                                            cellContent = value.toLocaleString();
+                                        }
+                                        // Handle everything else
+                                        else {
                                             cellContent = String(value);
                                         }
                                     }
