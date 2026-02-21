@@ -16,10 +16,10 @@ export default function MaintenancePage() {
     const maintenanceLogs = expenses?.filter((e: any) => e.type === 'Maintenance') || [];
 
     const columns = [
-        { header: 'Date', accessor: (e: any) => <span className="text-gray-400 font-medium">{new Date(e.date).toLocaleDateString()}</span> },
-        { header: 'Vehicle', accessor: (e: any) => <span className="font-bold text-white">{e.vehicleId?.name || 'N/A'}</span> },
-        { header: 'Service Performed', accessor: (e: any) => <span className="text-gray-400">{e.description}</span> },
-        { header: 'Cost', accessor: (e: any) => <span className="text-white font-bold text-lg">${e.amount.toLocaleString()}</span> },
+        { header: 'Date', accessor: (e: any) => <span className="text-gray-400 font-medium">{e?.date ? new Date(e.date).toLocaleDateString() : 'N/A'}</span> },
+        { header: 'Vehicle', accessor: (e: any) => <span className="font-bold text-white">{e?.vehicleId?.name || 'N/A'}</span> },
+        { header: 'Service Performed', accessor: (e: any) => <span className="text-gray-400">{e?.description || 'N/A'}</span> },
+        { header: 'Cost', accessor: (e: any) => <span className="text-white font-bold text-lg">${(e?.amount || 0).toLocaleString()}</span> },
         { 
             header: 'Status', 
             accessor: () => <StatusBadge status="Completed" /> 

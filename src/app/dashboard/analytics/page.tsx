@@ -14,11 +14,11 @@ export default function AnalyticsPage() {
             header: 'Fuel Efficiency', 
             accessor: (v: any) => (
                 <div className="flex flex-col gap-1.5">
-                    <span className="text-sm font-bold text-gray-300">{v.fuelEfficiencyKmL.toFixed(2)} km/L</span>
+                    <span className="text-sm font-bold text-gray-300">{v?.fuelEfficiencyKmL?.toFixed(2) || '0.00'} km/L</span>
                     <div className="w-24 bg-gray-800 rounded-full h-1.5 overflow-hidden">
                         <div 
                             className="bg-[#FFC229] h-full rounded-full shadow-[0_0_8px_rgba(255,194,41,0.6)]" 
-                            style={{ width: `${Math.min(v.fuelEfficiencyKmL * 5, 100)}%` }}
+                            style={{ width: `${Math.min((v?.fuelEfficiencyKmL || 0) * 5, 100)}%` }}
                         ></div>
                     </div>
                 </div>
@@ -26,19 +26,22 @@ export default function AnalyticsPage() {
         },
         { 
             header: 'Total Expenses', 
-            accessor: (v: any) => <span className="text-gray-400 font-medium">${v.totalExpenses.toLocaleString()}</span>
+            accessor: (v: any) => <span className="text-gray-400 font-medium">${(v?.totalExpenses || 0).toLocaleString()}</span>
         },
         { 
             header: 'Total Revenue', 
-            accessor: (v: any) => <span className="text-white font-bold">${v.totalRevenue.toLocaleString()}</span>
+            accessor: (v: any) => <span className="text-white font-bold">${(v?.totalRevenue || 0).toLocaleString()}</span>
         },
         { 
             header: 'ROI', 
-            accessor: (v: any) => (
-                <span className={`font-black tracking-wide ${v.roiPercentage >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {v.roiPercentage >= 0 ? '+' : ''}{v.roiPercentage.toFixed(1)}%
-                </span>
-            ) 
+            accessor: (v: any) => {
+                const roi = v?.roiPercentage || 0;
+                return (
+                    <span className={`font-black tracking-wide ${roi >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {roi >= 0 ? '+' : ''}{roi.toFixed(1)}%
+                    </span>
+                );
+            } 
         }
     ];
 
@@ -97,7 +100,7 @@ export default function AnalyticsPage() {
                     </div>
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Total Operational Cost</p>
                     <p className="text-4xl font-black text-white truncate">
-                        {isLoading ? '...' : `$${analytics?.vehicleAnalytics?.reduce((acc: number, curr: any) => acc + curr.totalExpenses, 0).toLocaleString()}`}
+                        {isLoading ? '...' : `$${(analytics?.vehicleAnalytics?.reduce((acc: number, curr: any) => acc + (curr?.totalExpenses || 0), 0) || 0).toLocaleString()}`}
                     </p>
                 </div>
             </div>

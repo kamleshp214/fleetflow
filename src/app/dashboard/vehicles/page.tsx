@@ -14,12 +14,12 @@ export default function VehicleRegistry() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const columns = [
-    { header: 'Asset Name', accessor: (v: any) => <span className="font-bold text-white tracking-wide">{v.name}</span> },
+    { header: 'Asset Name', accessor: (v: any) => <span className="font-bold text-white tracking-wide">{v?.name || 'N/A'}</span> },
     { 
       header: 'License Plate', 
       accessor: (v: any) => (
         <span className="text-gray-300 font-bold tracking-widest px-3 py-1.5 bg-white/5 rounded-xl border border-white/10 uppercase text-xs">
-          {v.licensePlate}
+          {v?.licensePlate || 'N/A'}
         </span>
       ) 
     },
@@ -27,7 +27,7 @@ export default function VehicleRegistry() {
       header: 'Max Capacity', 
       accessor: (v: any) => (
         <span className="text-white font-bold">
-          {v.maxCapacityKg.toLocaleString()} <span className="text-gray-500 font-medium text-xs ml-1">kg</span>
+          {(v?.maxCapacityKg || 0).toLocaleString()} <span className="text-gray-500 font-medium text-xs ml-1">kg</span>
         </span>
       ) 
     },
@@ -35,13 +35,13 @@ export default function VehicleRegistry() {
       header: 'Odometer', 
       accessor: (v: any) => (
         <span className="text-white font-bold">
-          {v.currentOdometer.toLocaleString()} <span className="text-gray-500 font-medium text-xs ml-1">km</span>
+          {(v?.currentOdometer || 0).toLocaleString()} <span className="text-gray-500 font-medium text-xs ml-1">km</span>
         </span>
       ) 
     },
     { 
       header: 'Status', 
-      accessor: (v: any) => <StatusBadge status={v.status} /> 
+      accessor: (v: any) => <StatusBadge status={v?.status || 'Unknown'} /> 
     }
   ];
 
