@@ -26,8 +26,22 @@ export default function GoogleSignInButton({ mode, onError }: GoogleSignInButton
       const idToken = await user.getIdToken();
 
       if (mode === 'register') {
-        // For registration, we need to collect role information
-        // Show role selection modal or redirect to role selection page
+        // First check if user already exists by trying to login
+        const loginResponse = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idToken }),
+        });
+
+        if (loginResponse.ok) {
+          // User already exists, just log them in
+          router.push('/dashboard');
+          router.refresh();
+          return;
+        }
+
+        // User doesn't exist, proceed with registration
+        // Show role selection page
         router.push(`/register/role-selection?idToken=${encodeURIComponent(idToken)}&name=${encodeURIComponent(user.displayName || '')}&email=${encodeURIComponent(user.email || '')}`);
       } else {
         // For login, send to backend

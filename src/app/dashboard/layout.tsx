@@ -14,6 +14,7 @@ import {
     UserCircle
 } from 'lucide-react';
 import { apiClient } from '@/lib/axios';
+import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 
 const navigation = [
     { 
@@ -56,14 +57,24 @@ const navigation = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const router = useRouter();
+    const { signOut } = useFirebaseAuth();
 
     const handleLogout = async () => {
         try {
+            // Sign out from Firebase first
+            await signOut();
+            
+            // Then clear server-side session
             await apiClient.post('/auth/logout');
+            
+            // Redirect to login
             router.push('/login');
         } catch (error) {
             console.error('Failed to logout', error);
-            document.cookie = "fleet_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            
+            // Fallback: clear cookies manually and redirect
+            document.cookie = "fleet_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "user_role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             router.push('/login');
         }
     };

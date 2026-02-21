@@ -1,7 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
+import { apiClient } from '@/lib/axios';
 
 const navItems = [
   { 
@@ -43,6 +45,28 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { signOut } = useFirebaseAuth();
+
+  const handleLogout = async () => {
+    try {
+      // Sign out from Firebase first
+      await signOut();
+      
+      // Then clear server-side session
+      await apiClient.post('/auth/logout');
+      
+      // Redirect to login
+      router.push('/login');
+    } catch (error) {
+      console.error('Failed to logout', error);
+      
+      // Fallback: clear cookies manually and redirect
+      document.cookie = "fleet_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "user_role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      router.push('/login');
+    }
+  };
 
   return (
     <aside className="w-72 bg-[#0a0a0a]/50 backdrop-blur-xl flex flex-col min-h-screen border-r border-white/5 transition-all duration-500 relative z-20 selection:bg-[#FFC229] selection:text-[#4A2B5E]">
@@ -89,7 +113,10 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-4 border-t border-white/5 relative z-10 bg-[#0a0a0a]/80 backdrop-blur-md">
-        <button className="flex items-center w-full px-4 py-3.5 text-sm font-bold text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-2xl transition-all duration-300 group">
+        <button 
+          onClick={handleLogout}
+          className="flex items-center w-full px-4 py-3.5 text-sm font-bold text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-2xl transition-all duration-300 group"
+        >
           <svg 
             className="w-5 h-5 mr-4 text-gray-600 group-hover:text-red-400 transition-colors" 
             fill="none" 
